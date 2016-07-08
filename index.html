@@ -12,7 +12,7 @@
     canvas {
       border: 1px solid #000;
       background-color: #fff;
-      display: none;
+
     }
 
     form {
@@ -74,35 +74,29 @@
 
   <canvas id="results"></canvas>
 
+  <script src="pixels-exploder.js"></script>
   <script>
     var filePickcer = document.getElementById('file');
     var colorPicker = document.getElementById('color');
     var pixelsSizePicker = document.getElementById('size');
     var presetImages = document.getElementsByTagName('img');
-    var resultsCanvas = document.getElementById('results');
-    var resultsCtx = resultsCanvas.getContext('2d');
 
-    var PIXEL_SIZE = parseInt(pixelsSizePicker.value, 10);
-    var UPLOADED_IMAGE = null;
+    var pixelsExploder = new PixelsExploder(document.getElementById('results'));
 
-    filePickcer.addEventListener('change', inputChangeHandler);
-    colorPicker.addEventListener('change', drawGrid);
-    pixelsSizePicker.addEventListener('change', function() {
-      PIXEL_SIZE = parseInt(pixelsSizePicker.value, 10);
-      render();
-    });
+    pixelsExploder.setPixelsSize(pixelsSizePicker.value);
 
     for (var i = 0, l = presetImages.length; i < l; i++) {
       presetImages[i].addEventListener('click', imageClickHandler);
     }
 
-    function imageClickHandler() {
-      if (UPLOADED_IMAGE === this) {
-        return;
-      }
+    filePickcer.addEventListener('change', inputChangeHandler);
 
-      UPLOADED_IMAGE = this;
-      render();
+    colorPicker.addEventListener('change', colorChangeHandler);
+
+    pixelsSizePicker.addEventListener('change', pixelsSizeChangeHandler);
+
+    function imageClickHandler() {
+      pixelsExploder.setImage(this).render();
     }
 
     function inputChangeHandler(e) {
@@ -112,50 +106,17 @@
     }
 
     function fileReaderLoadHandler() {
-      UPLOADED_IMAGE = new Image();
-      UPLOADED_IMAGE.onload = render;
-      UPLOADED_IMAGE.src = this.result;
+      var image = new Image();
+      image.onload = pixelsExploder.render.bind(pixelsExploder);
+      image.src = this.result;
     }
 
-    function render() {
-      if (!UPLOADED_IMAGE) {
-        return;
-      }
-
-      resultsCanvas.width = UPLOADED_IMAGE.naturalWidth * 2 * PIXEL_SIZE - PIXEL_SIZE;
-      resultsCanvas.height = UPLOADED_IMAGE.naturalHeight * 2 * PIXEL_SIZE - PIXEL_SIZE;
-
-      resultsCtx.imageSmoothingEnabled = false;
-      resultsCtx.mozImageSmoothingEnabled = false;
-      resultsCtx.webkitImageSmoothingEnabled = false;
-      resultsCtx.msImageSmoothingEnabled = false;
-
-      resultsCtx.drawImage(UPLOADED_IMAGE, 0, 0, resultsCanvas.width, resultsCanvas.height);
-
-      drawGrid();
-
-      resultsCanvas.style.display = 'inline';
+    function colorChangeHandler() {
+      pixelsExploder.setGridColor(this.value).drawGrid();
     }
 
-    function drawGrid() {
-      resultsCtx.beginPath();
-      resultsCtx.strokeStyle = colorPicker.value;
-
-      for (var i = PIXEL_SIZE; i < resultsCanvas.width; i += 2 * PIXEL_SIZE) {
-        for (var j = 0; j < PIXEL_SIZE; j++) {
-          resultsCtx.moveTo(i + j + .5, -1);
-          resultsCtx.lineTo(i + j + .5, resultsCanvas.height);
-        }
-      }
-
-      for (var i = PIXEL_SIZE; i < resultsCanvas.height; i += 2 * PIXEL_SIZE) {
-        for (var j = 0; j < PIXEL_SIZE; j++) {
-          resultsCtx.moveTo(-1, i + j + .5);
-          resultsCtx.lineTo(resultsCanvas.width, i + j + .5);
-        }
-      }
-
-      resultsCtx.stroke();
+    function pixelsSizeChangeHandler() {
+      pixelsExploder.setPixelsSize(pixelsSizePicker.value).render();
     }
   </script>
   

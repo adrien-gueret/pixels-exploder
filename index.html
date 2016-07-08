@@ -126,6 +126,10 @@
       resultsCanvas.height = UPLOADED_IMAGE.naturalHeight * 2 * PIXEL_SIZE - PIXEL_SIZE;
 
       resultsCtx.imageSmoothingEnabled = false;
+      resultsCtx.mozImageSmoothingEnabled = false;
+      resultsCtx.webkitImageSmoothingEnabled = false;
+      resultsCtx.msImageSmoothingEnabled = false;
+
       resultsCtx.drawImage(UPLOADED_IMAGE, 0, 0, resultsCanvas.width, resultsCanvas.height);
 
       drawGrid();

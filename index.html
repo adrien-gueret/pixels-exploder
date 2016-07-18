@@ -107,6 +107,7 @@
 
     function fileReaderLoadHandler() {
       var image = new Image();
+      pixelsExploder.setImage(image);
       image.onload = pixelsExploder.render.bind(pixelsExploder);
       image.src = this.result;
     }
